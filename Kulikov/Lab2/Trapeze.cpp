@@ -1,24 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   Trapeze.cpp
- * Author: ekulikov
- * 
- * Created on 15 марта 2018 г., 17:31
- */
-
 #include "Trapeze.h"
 #include <cmath>
 #include <iostream>
 
 using namespace std;
 
-Trapeze::Trapeze(std::pair <double, double> a, pair<double, double> b, pair<double, double> c, pair<double, double> d): _a(a), _b(b), _c(c), _d(d)  {
-    
+Trapeze::Trapeze(const Point a, const Point b, const Point c, const Point d): _a(a), _b(b), _c(c), _d(d)  {
+    if (abs((_a.x - _b.x)/(_a.y - _b.y)) == abs((_c.x - _d.x)/(_c.y - _d.y))) {
+        cout << "The new Trapeze has been created!" << endl;          
+    } else 
+        if (abs((_b.x - _c.x)/(_b.y - _c.y)) == abs((_a.x - _d.x)/(_a.y - _d.y))) {
+            cout << "The new Trapeze has been created!" << endl;
+        } else throw badTrapezeException();
+    _id = Shape::sCounter++;
 }
 
 
@@ -26,21 +19,19 @@ Trapeze::~Trapeze() {
 }
 
 
-string Trapeze::getId(){
-    char buff[20];
-    snprintf(buff, sizeof(buff), "%p", this);
-    return string(buff);
+int Trapeze::getId(){
+    return _id;
 }
 
 
 Point Trapeze::positionCentre(){
     Point A; Point B; Point C; Point D;
   
-    A.x = std::min(std::min(_a.first, _b.first), std::min(_c.first, _d.first));
-    A.y = std::min(std::min(_a.second, _b.second), std::min(_c.second, _d.second));
+    A.x = min(min(_a.x, _b.x), min(_c.x, _d.x));
+    A.y = min(min(_a.y, _b.y), min(_c.y, _d.y));
     
-    C.x = std::max(std::max(_a.first, _b.first), std::max(_c.first, _d.first));
-    C.y = std::max(std::max(_a.second, _b.second), std::max(_c.second, _d.second));   
+    C.x = max(max(_a.x, _b.x), max(_c.x, _d.x));
+    C.y = max(max(_a.y, _b.y), max(_c.y, _d.y));   
     
     B.x = A.x;
     B.y = C.y;
@@ -57,15 +48,15 @@ Point Trapeze::positionCentre(){
 }
 
 
-void Trapeze::move(Point newP) {
+void Trapeze::move(const Point newP) {
     Point centre = positionCentre();
     
     double movedX = newP.x - centre.x;
     double movedY = newP.y - centre.y;
-    _a.first += movedX; _a.second += movedY;
-    _b.first += movedX; _b.second += movedY;
-    _c.first += movedX; _c.second += movedY;        
-    _d.first += movedX; _d.second += movedY;
+    _a.x += movedX; _a.y += movedY;
+    _b.x += movedX; _b.y += movedY;
+    _c.x += movedX; _c.y += movedY;        
+    _d.x += movedX; _d.y += movedY;
 }
 
 void Trapeze::turn(double angle){
@@ -73,36 +64,36 @@ void Trapeze::turn(double angle){
     
     Point tmp;
     
-    tmp.x = _a.first*cos(angle) - _a.second*sin(angle);
-    tmp.y = _a.first*sin(angle) + _a.second*cos(angle); 
-    _a.first = tmp.x;
-    _a.second = tmp.y;
+    tmp.x = _a.x*cos(angle) - _a.y*sin(angle);
+    tmp.y = _a.x*sin(angle) + _a.y*cos(angle); 
+    _a.x = tmp.x;
+    _a.y = tmp.y;
     
     
-    tmp.x = _b.first*cos(angle) - _b.second*sin(angle);
-    tmp.y = _b.first*sin(angle) + _b.second*cos(angle); 
-    _b.first = tmp.x;
-    _b.second = tmp.y;
+    tmp.x = _b.x*cos(angle) - _b.y*sin(angle);
+    tmp.y = _b.x*sin(angle) + _b.y*cos(angle); 
+    _b.x = tmp.x;
+    _b.y = tmp.y;
     
     
-    tmp.x = _c.first*cos(angle) - _c.second*sin(angle);
-    tmp.y = _c.first*sin(angle) + _c.second*cos(angle); 
-    _c.first = tmp.x;
-    _c.second = tmp.y;
+    tmp.x = _c.x*cos(angle) - _c.y*sin(angle);
+    tmp.y = _c.x*sin(angle) + _c.y*cos(angle); 
+    _c.x = tmp.x;
+    _c.y = tmp.y;
     
     
-    tmp.x = _d.first*cos(angle) - _d.second*sin(angle);
-    tmp.y = _d.first*sin(angle) + _d.second*cos(angle); 
-    _d.first = tmp.x;
-    _d.second = tmp.y;    
+    tmp.x = _d.x*cos(angle) - _d.y*sin(angle);
+    tmp.y = _d.x*sin(angle) + _d.y*cos(angle); 
+    _d.x = tmp.x;
+    _d.y = tmp.y;    
 }
 
 
 void Trapeze::scale(double factor){
-    _a.first *= factor; _a.second *= factor;
-    _b.first *= factor; _b.second *= factor;
-    _c.first *= factor; _c.second *= factor;
-    _d.first *= factor; _d.second *= factor;
+    _a.x *= factor; _a.y *= factor;
+    _b.x *= factor; _b.y *= factor;
+    _c.x *= factor; _c.y *= factor;
+    _d.x *= factor; _d.y *= factor;
 
 }
 
@@ -118,7 +109,7 @@ string Trapeze::getColor() {
 
 
 ostream& operator<<(ostream& os, const Trapeze& trap){
-    os << '(' << trap._a.first << ':' << trap._a.second << ')' << endl << '(' << trap._b.first << ':' << trap._b.second << ')' << endl << '(' << trap._c.first << ':' << trap._c.second << ')' << endl << '(' << trap._d.first << ':' << trap._d.second << ')' << endl;
+    os << '(' << trap._a.x << ':' << trap._a.y << ')' << endl << '(' << trap._b.x << ':' << trap._b.y << ')' << endl << '(' << trap._c.x << ':' << trap._c.y << ')' << endl << '(' << trap._d.x << ':' << trap._d.y << ')' << endl;
             
     return os;
 
