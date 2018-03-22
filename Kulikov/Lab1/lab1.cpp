@@ -46,12 +46,19 @@ public:
     std::swap(this->m_array, object.m_array);
   }
 
-  Array(Array&& other) 
+/*  Array(Array&& other) 
     : Array() 
     { 
       swap(*this, other); 
-    } 
+    }  */
     
+  Array(Array&& arr)    //новый конструктор перемещения с освобождением 
+     : Array()
+    {
+      arr.m_size = 0;
+      arr.m_array = nullptr;
+    }
+  
 private:
   size_t m_size;
   //T* m_array;
