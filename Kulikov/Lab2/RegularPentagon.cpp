@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   RegularPentagon.cpp
- * Author: ekulikov
- * 
- * Created on 15 марта 2018 г., 17:33
- */
-
 #include "RegularPentagon.h"
 #include <cmath>
 #include <iostream>
@@ -18,8 +5,20 @@
 using namespace std;
 
 
-RegularPentagon::RegularPentagon(pair<double, double> a, pair<double, double> b, pair<double, double> c, pair<double, double> d, pair<double, double> e) : _a(a), _b(b), _c(c), _d(d) , _e(e) {
-  
+RegularPentagon::RegularPentagon(const Point a, const Point b, const Point c, const Point d, const Point e) : _a(a), _b(b), _c(c), _d(d) , _e(e) {
+    
+    double m1=round(sqrt(pow(((c.x+d.x)/2-a.x),2)+pow(((c.y+d.y)/2-a.y),2)) * 100)/100;
+    double m2=round(sqrt(pow(((d.x+e.x)/2-b.x),2)+pow(((d.y+e.y)/2-b.y),2))*100) /100;
+    double m3=round(sqrt(pow(((a.x+e.x)/2-c.x),2)+pow(((a.y+e.y)/2-c.y),2))*100)/100;
+    double m4=round(sqrt(pow(((a.x+b.x)/2-d.x),2)+pow(((a.y+b.y)/2-d.y),2))*100)/100;
+    double m5=round(sqrt(pow(((c.x+b.x)/2-e.x),2)+pow(((c.y+b.y)/2-e.y),2))*100)/100;
+
+    if(!(m1==m2 && m1==m3 && m1==m4 && m1==m5)){
+        throw badPentagonException();
+    }
+    
+    
+  _id = Shape::sCounter++;
 }
 
 
@@ -27,20 +26,18 @@ RegularPentagon::~RegularPentagon() {
 }
 
 
-string RegularPentagon::getId(){
-    char buff[20];
-    snprintf(buff, sizeof(buff), "%p", this);
-    return string(buff);
+int RegularPentagon::getId(){
+    return _id;
 }
 
 Point RegularPentagon::positionCentre(){
     Point A; Point C;
   
-    A.x = min((min(_a.first, _b.first), min(_c.first, _d.first)), _e.first);
-    A.y = min((min(_a.second, _b.second), min(_c.second, _d.second)), _e.second);
+    A.x = min((min(_a.x, _b.x), min(_c.x, _d.x)), _e.x);
+    A.y = min((min(_a.y, _b.y), min(_c.y, _d.y)), _e.y);
     
-    C.x = max((max(_a.first, _b.first), max(_c.first, _d.first)), _e.first);
-    C.y = max((max(_a.second, _b.second), max(_c.second, _d.second)), _e.second);   
+    C.x = max((max(_a.x, _b.x), max(_c.x, _d.x)), _e.x);
+    C.y = max((max(_a.y, _b.y), max(_c.y, _d.y)), _e.y);   
     
     
     double xc = (C.x - A.x) / 2;
@@ -52,15 +49,15 @@ Point RegularPentagon::positionCentre(){
 }
 
 
-void RegularPentagon::move(Point newP){
+void RegularPentagon::move(const Point newP){
     Point centre = positionCentre();
     
     double movedX = newP.x ;
     double movedY = newP.y;
-    _a.first += movedX; _a.second += movedY;
-    _b.first += movedX; _b.second += movedY;
-    _c.first += movedX; _c.second += movedY;        
-    _d.first += movedX; _d.second += movedY;
+    _a.x += movedX; _a.y += movedY;
+    _b.x += movedX; _b.y += movedY;
+    _c.x += movedX; _c.y += movedY;        
+    _d.x += movedX; _d.y += movedY;
 }
 
 
@@ -69,43 +66,43 @@ void RegularPentagon::turn(double angle){
     
     Point tmp;
     
-    tmp.x = _a.first*cos(angle) - _a.second*sin(angle);
-    tmp.y = _a.first*sin(angle) + _a.second*cos(angle); 
-    _a.first = tmp.x;
-    _a.second = tmp.y;
+    tmp.x = _a.x*cos(angle) - _a.y*sin(angle);
+    tmp.y = _a.x*sin(angle) + _a.y*cos(angle); 
+    _a.x = tmp.x;
+    _a.y = tmp.y;
     
     
-    tmp.x = _b.first*cos(angle) - _b.second*sin(angle);
-    tmp.y = _b.first*sin(angle) + _b.second*cos(angle); 
-    _b.first = tmp.x;
-    _b.second = tmp.y;
+    tmp.x = _b.x*cos(angle) - _b.y*sin(angle);
+    tmp.y = _b.x*sin(angle) + _b.y*cos(angle); 
+    _b.x = tmp.x;
+    _b.y = tmp.y;
     
     
-    tmp.x = _c.first*cos(angle) - _c.second*sin(angle);
-    tmp.y = _c.first*sin(angle) + _c.second*cos(angle); 
-    _c.first = tmp.x;
-    _c.second = tmp.y;
+    tmp.x = _c.x*cos(angle) - _c.y*sin(angle);
+    tmp.y = _c.x*sin(angle) + _c.y*cos(angle); 
+    _c.x = tmp.x;
+    _c.y = tmp.y;
     
     
-    tmp.x = _d.first*cos(angle) - _d.second*sin(angle);
-    tmp.y = _d.first*sin(angle) + _d.second*cos(angle); 
-    _d.first = tmp.x;
-    _d.second = tmp.y;  
+    tmp.x = _d.x*cos(angle) - _d.y*sin(angle);
+    tmp.y = _d.x*sin(angle) + _d.y*cos(angle); 
+    _d.x = tmp.x;
+    _d.y = tmp.y;  
     
     
-    tmp.x = _e.first*cos(angle) - _e.second*sin(angle);
-    tmp.y = _e.first*sin(angle) + _e.second*cos(angle); 
-    _e.first = tmp.x;
-    _e.second = tmp.y;
+    tmp.x = _e.x*cos(angle) - _e.y*sin(angle);
+    tmp.y = _e.x*sin(angle) + _e.y*cos(angle); 
+    _e.x = tmp.x;
+    _e.y = tmp.y;
 }
 
 
 void RegularPentagon::scale(double factor){
-    _a.first *= factor; _a.second *= factor;
-    _b.first *= factor; _b.second *= factor;
-    _c.first *= factor; _c.second *= factor;
-    _d.first *= factor; _d.second *= factor;
-    _e.first *= factor; _e.second *= factor;
+    _a.x *= factor; _a.y *= factor;
+    _b.x *= factor; _b.y *= factor;
+    _c.x *= factor; _c.y *= factor;
+    _d.x *= factor; _d.y *= factor;
+    _e.x *= factor; _e.y *= factor;
 }
 
 
@@ -120,7 +117,7 @@ string RegularPentagon::getColor() {
 
 
 ostream& operator<<(ostream& os, const RegularPentagon& pent){
-    os << '(' << pent._a.first << ':' << pent._a.second << ')' << endl << '(' << pent._b.first << ':' << pent._b.second << ')' << endl << '(' << pent._c.first << ':' << pent._c.second << ')' << endl << '(' << pent._d.first << ':' << pent._d.second << ')' << endl << '(' << pent._e.first << ':' << pent._e.second << ')' << endl;    
+    os << '(' << pent._a.x << ':' << pent._a.y << ')' << endl << '(' << pent._b.x << ':' << pent._b.y << ')' << endl << '(' << pent._c.x << ':' << pent._c.y << ')' << endl << '(' << pent._d.x << ':' << pent._d.y << ')' << endl << '(' << pent._e.x << ':' << pent._e.y << ')' << endl;    
     return os;
 
 }
