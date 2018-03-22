@@ -1,16 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   Rectangle.cpp
- * Author: ekulikov
- * 
- * Created on 8 августа 2017 г., 16:48
- */
-
 #include "Rectangle.h"
 #include <cmath>
 #include <iostream>
@@ -18,39 +5,44 @@
 
 using namespace std;
 
-Rectangle::Rectangle(pair <double, double> a, pair<double, double> b, pair<double, double> c, pair<double, double> d) : _a(a), _b(b), _c(c), _d(d) {
-    
+Rectangle::Rectangle(const Point a, const Point b, const Point c, const Point d) : _a(a), _b(b), _c(c), _d(d) {
+    if ((sqrt(powf(_a.x - _c.x, 2) + powf(_a.y - _c.y, 2))) == 
+        (sqrt(powf(_d.x - _b.x, 2) + powf(_d.y - _b.y, 2)))) {
+        cout << "The new Rectangle has been created!" << endl;
+        
+    } else {
+        throw badRectangleException();   
+    }
+
+    _id = Shape::sCounter++;
 }
 
 Rectangle::~Rectangle() {
 }
 
-
-string Rectangle::getId(){
-    char buff[20];
-    snprintf(buff, sizeof(buff), "%p", this);
-    return string(buff);
+int Rectangle::getId(){
+    return _id;
 }
 
 Point Rectangle::positionCentre(){
-    double xc = (_c.first - _a.first) / 2;
-    double yc = (_c.second - _a.second) / 2;
+    double xc = (_c.x - _a.x) / 2;
+    double yc = (_c.y - _a.y) / 2;
     Point centre;
     centre.x = xc;
     centre.y = yc;
     return centre;
 }
 
-void Rectangle::move(Point newP) {
+void Rectangle::move(const Point newP) {
     
     Point centre = positionCentre();
     
     double movedX = newP.x - centre.x;
     double movedY = newP.y - centre.y;
-    _a.first += movedX; _a.second += movedY;
-    _b.first += movedX; _b.second += movedY;
-    _c.first += movedX; _c.second += movedY;        
-    _d.first += movedX; _d.second += movedY;        
+    _a.x += movedX; _a.y += movedY;
+    _b.x += movedX; _b.y += movedY;
+    _c.x += movedX; _c.y += movedY;        
+    _d.x += movedX; _d.y += movedY;        
 }
 
 
@@ -59,41 +51,39 @@ void Rectangle::turn(double angle){
     
     Point tmp;
     
-    tmp.x = _a.first*cos(angle) - _a.second*sin(angle);
-    tmp.y = _a.first*sin(angle) + _a.second*cos(angle); 
-    _a.first = tmp.x;
-    _a.second = tmp.y;
+    tmp.x = _a.x*cos(angle) - _a.y*sin(angle);
+    tmp.y = _a.x*sin(angle) + _a.y*cos(angle); 
+    _a.x = tmp.x;
+    _a.y = tmp.y;
     
     
-    tmp.x = _b.first*cos(angle) - _b.second*sin(angle);
-    tmp.y = _b.first*sin(angle) + _b.second*cos(angle); 
-    _b.first = tmp.x;
-    _b.second = tmp.y;
+    tmp.x = _b.x*cos(angle) - _b.y*sin(angle);
+    tmp.y = _b.x*sin(angle) + _b.y*cos(angle); 
+    _b.x = tmp.x;
+    _b.y = tmp.y;
     
     
-    tmp.x = _c.first*cos(angle) - _c.second*sin(angle);
-    tmp.y = _c.first*sin(angle) + _c.second*cos(angle); 
-    _c.first = tmp.x;
-    _c.second = tmp.y;
+    tmp.x = _c.x*cos(angle) - _c.y*sin(angle);
+    tmp.y = _c.x*sin(angle) + _c.y*cos(angle); 
+    _c.x = tmp.x;
+    _c.y = tmp.y;
     
     
-    tmp.x = _d.first*cos(angle) - _d.second*sin(angle);
-    tmp.y = _d.first*sin(angle) + _d.second*cos(angle); 
-    _d.first = tmp.x;
-    _d.second = tmp.y;
-    
-    
+    tmp.x = _d.x*cos(angle) - _d.y*sin(angle);
+    tmp.y = _d.x*sin(angle) + _d.y*cos(angle); 
+    _d.x = tmp.x;
+    _d.y = tmp.y; 
 }
 
 
 void Rectangle::scale(double factor){
-    _a.first *= factor; _a.second *= factor;
-    _b.first *= factor; _b.second *= factor;
-    _c.first *= factor; _c.second *= factor;
-    _d.first *= factor; _d.second *= factor;
+    _a.x *= factor; _a.y *= factor;
+    _b.x *= factor; _b.y *= factor;
+    _c.x *= factor; _c.y *= factor;
+    _d.x *= factor; _d.y *= factor;
 }
 
-void Rectangle::setColor(std::string color) {
+void Rectangle::setColor(string color) {
     _color = color;
 }
 
@@ -102,8 +92,7 @@ string Rectangle::getColor() {
 }
 
 ostream& operator<<(ostream& os, const Rectangle& rect){
-    os << '(' << rect._a.first << ':' << rect._a.second << ')' << endl << '(' << rect._b.first << ':' << rect._b.second << ')' << endl << '(' << rect._c.first << ':' << rect._c.second << ')' << endl << '(' << rect._d.first << ':' << rect._d.second << ')' << endl;
+    os << '(' << rect._a.x << ':' << rect._a.y << ')' << endl << '(' << rect._b.x << ':' << rect._b.y << ')' << endl << '(' << rect._c.x << ':' << rect._c.y << ')' << endl << '(' << rect._d.x << ':' << rect._d.y << ')' << endl;
             
     return os;
-
 }
