@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 
+
 using namespace std;
 
 Trapeze::Trapeze(const Point a, const Point b, const Point c, const Point d): _a(a), _b(b), _c(c), _d(d)  {
@@ -10,8 +11,8 @@ Trapeze::Trapeze(const Point a, const Point b, const Point c, const Point d): _a
     } else 
         if (abs((_b.x - _c.x)/(_b.y - _c.y)) == abs((_a.x - _d.x)/(_a.y - _d.y))) {
             cout << "The new Trapeze has been created!" << endl;
-        } else throw badTrapezeException();
-    _id = Shape::sCounter++;
+        } else throw BadFigureException("Trapeze");
+    _id = getNextId();
 }
 
 
@@ -19,34 +20,176 @@ Trapeze::~Trapeze() {
 }
 
 
-int Trapeze::getId(){
+
+uint32_t Trapeze::id(){
     return _id;
 }
 
 
 Point Trapeze::positionCentre(){
-    Point A; Point B; Point C; Point D;
-  
-    A.x = min(min(_a.x, _b.x), min(_c.x, _d.x));
-    A.y = min(min(_a.y, _b.y), min(_c.y, _d.y));
-    
-    C.x = max(max(_a.x, _b.x), max(_c.x, _d.x));
-    C.y = max(max(_a.y, _b.y), max(_c.y, _d.y));   
-    
-    B.x = A.x;
-    B.y = C.y;
-    
-    D.x = C.x;
-    D.y = A.y;
-    
-    double xc = (C.x - A.x) / 2;
-    double yc = (C.y - A.y) / 2;
-    Point centre;
-    centre.x = xc;
-    centre.y = yc;
-    return centre;
+
+   Point centre;
+
+    if (abs((_a.x - _b.x)/(_a.y - _b.y)) == abs((_c.x - _d.x)/(_c.y - _d.y))) {
+
+        double bigBase;   
+        double smallBase;
+        Point bigBaseCentre; Point smallBaseCentre;
+        
+        
+        if (sqrt(powf(_a.x - _b.x, 2) + powf(_a.y - _b.y, 2)) > sqrt(powf(_c.x - _d.x, 2) + powf(_c.y - _d.y, 2))) {
+            bigBase   = sqrt(powf(_a.x - _b.x, 2) + powf(_a.y - _b.y, 2));
+            smallBase = sqrt(powf(_c.x - _d.x, 2) + powf(_c.y - _d.y, 2));
+
+            bigBaseCentre.x = (_a.x + _b.x) / 2;
+            bigBaseCentre.y = (_a.y + _b.y) / 2; 
+            smallBaseCentre.x = (_c.x + _d.x) / 2;
+            smallBaseCentre.y = (_c.y + _d.y) / 2;
+        } else {
+            smallBase   = sqrt(powf(_a.x - _b.x, 2) + powf(_a.y - _b.y, 2));
+            bigBase = sqrt(powf(_c.x - _d.x, 2) + powf(_c.y - _d.y, 2));
+
+            smallBaseCentre.x = (_a.x + _b.x) / 2;
+            smallBaseCentre.y = (_a.y + _b.y) / 2; 
+            bigBaseCentre.x = (_c.x + _d.x) / 2;
+            bigBaseCentre.y = (_c.y + _d.y) / 2;                
+        }
+        
+
+        double height = getHeight();
+        
+        double dist = (height/3) * ((2 * bigBase + smallBase) / (bigBase + smallBase));
+        
+        double med = sqrt(powf(((_c.y + _d.y)/2) - ((_a.y + _b.y)/2), 2) + powf(((_c.y + _d.y)/2) - ((_a.y + _b.y)/2), 2));
+            
+        if (smallBaseCentre.x < bigBaseCentre.x) {
+            double diff = dist / med;
+            centre.x = smallBaseCentre.x + (bigBaseCentre.x - smallBaseCentre.x) * diff; 
+        } else {
+            double diff = (med - dist) / med;
+            centre.x = bigBaseCentre.x + (smallBaseCentre.x - bigBaseCentre.x) * diff;
+        }
+        
+        if (smallBaseCentre.y > bigBaseCentre.y) {
+            double diff = dist / med; 
+            centre.y = bigBaseCentre.y + (smallBaseCentre.y - bigBaseCentre.y) * diff;
+            
+        } else {
+            double diff = (med - dist) / med;
+            centre.y = bigBaseCentre.y - (bigBaseCentre.y - smallBaseCentre.y) * diff; 
+        }
+         
+        
+        return centre;  
+    }
+   
+    if (abs((_b.x - _c.x)/(_a.y - _d.y)) == abs((_b.x - _c.x)/(_a.y - _d.y))){
+
+        double bigBase;   
+        double smallBase;
+        Point bigBaseCentre; Point smallBaseCentre;
+        
+        
+        if (sqrt(powf(_b.x - _c.x, 2) + powf(_b.y - _c.y, 2)) > sqrt(powf(_a.x - _d.x, 2) + powf(_a.y - _d.y, 2))) {
+            bigBase   = sqrt(powf(_b.x - _c.x, 2) + powf(_b.y - _c.y, 2));
+            smallBase = sqrt(powf(_a.x - _d.x, 2) + powf(_a.y - _d.y, 2));
+            
+            
+            bigBaseCentre.x = (_b.x + _c.x) / 2;
+            bigBaseCentre.y = (_b.y + _c.y) / 2; 
+            smallBaseCentre.x = (_a.x + _d.x) / 2;
+            smallBaseCentre.y = (_a.y + _d.y) / 2;
+        } else {
+            smallBase   = sqrt(powf(_b.x - _c.x, 2) + powf(_b.y - _c.y, 2));
+            bigBase = sqrt(powf(_a.x - _d.x, 2) + powf(_a.y - _d.y, 2));
+            
+            
+            smallBaseCentre.x = (_b.x + _c.x) / 2;
+            smallBaseCentre.y = (_b.y + _c.y) / 2; 
+            bigBaseCentre.x = (_a.x + _d.x) / 2;
+            bigBaseCentre.y = (_a.y + _d.y) / 2;                
+        }
+        
+
+        double height = getHeight();
+        
+        double dist = (height/3) * ((2 * bigBase + smallBase) / (bigBase + smallBase));
+        
+        double med = sqrt(powf(((_a.y + _d.y)/2) - ((_b.y + _c.y)/2), 2) + powf(((_a.y + _d.y)/2) - ((_b.y + _c.y)/2), 2));
+            
+        if (smallBaseCentre.x < bigBaseCentre.x) {
+            double diff = dist / med;
+            centre.x = smallBaseCentre.x + (bigBaseCentre.x - smallBaseCentre.x) * diff; 
+        } else {
+            double diff = (med - dist) / med;
+            centre.x = bigBaseCentre.x + (smallBaseCentre.x - bigBaseCentre.x) * diff;
+        }
+        
+        if (smallBaseCentre.y > bigBaseCentre.y) {
+            double diff = dist / med; 
+            centre.y = bigBaseCentre.y + (smallBaseCentre.y - bigBaseCentre.y) * diff;
+            
+        } else {
+            double diff = (med - dist) / med;
+            centre.y = bigBaseCentre.y - (bigBaseCentre.y - smallBaseCentre.y) * diff; 
+        }
+         
+        
+        return centre;  
+    } 
+
 }
 
+
+
+
+
+double Trapeze::getHeight(){
+    if (abs((_a.x - _b.x)/(_a.y - _b.y)) == abs((_c.x - _d.x)/(_c.y - _d.y))) {
+
+        Point inter;
+        
+        double A1 = _a.y - _b.y;
+        double B1 = _b.x - _a.x;
+        double C1 = _a.x*_b.y - _b.x*_a.y;
+        
+        double A2 = _c.y - _d.y;
+        double B2 = _d.x - _c.x;
+        double C2 = _c.x*_d.y - _d.x*_c.y;
+        
+        
+        double delta    = A2                    *  A1       -       B2       *  (-1)*B1;
+        double delta_x = (-1)*C2                *  A1       -       B2       *  (A1*_a.y - B1*_a.x);
+        double delta_y = (A1*_a.y - B1*_a.x)    *  A2       -       (-1)*C2  *  (-1)*B1;
+        
+        
+        inter.x = delta_x / delta;
+        inter.y = delta_y / delta;
+        
+        return sqrt(powf(_a.x - inter.x, 2) + powf(_a.y - inter.y, 2));
+        
+        
+    } else if (abs((_b.x - _c.x)/(_b.y - _c.y)) == abs((_a.x - _d.x)/(_a.y - _d.y))) {
+        Point inter;
+        
+        double A1 = _b.y - _c.y;
+        double B1 = _c.x - _b.x;
+        double C1 = _b.x*_c.y - _c.x*_b.y;
+        
+        double A2 = _a.y - _d.y;
+        double B2 = _d.x - _a.x;
+        double C2 = _a.x*_d.y - _d.x*_a.y;   
+        
+        double delta    = A2  *  A1                   -   B2      *  (-1)*B1;
+        double delta_x = (-1)*C2  *  A1              -   B2  *  (A1*_b.y - B1*_b.x);
+        double delta_y = A2  *  (A1*_b.y - B1*_b.x)  -  (-1)*C2  *  (-1)*B1;
+        
+        inter.x = delta_x / delta;
+        inter.y = delta_y / delta;
+        
+        return sqrt(powf(_b.x - inter.x, 2) + powf(_b.y - inter.y, 2));        
+    }
+}
 
 void Trapeze::move(const Point newP) {
     Point centre = positionCentre();
@@ -60,41 +203,71 @@ void Trapeze::move(const Point newP) {
 }
 
 void Trapeze::turn(double angle){
+    Point centre = positionCentre();
+    
+    angle =  fmod(angle, 360);
     angle *= M_PI/180;
+    cout << sin(angle) << endl;
     
     Point tmp;
     
-    tmp.x = _a.x*cos(angle) - _a.y*sin(angle);
-    tmp.y = _a.x*sin(angle) + _a.y*cos(angle); 
-    _a.x = tmp.x;
-    _a.y = tmp.y;
+    //X = x0 + (x - x0) * cos(a) - (y - y0) * sin(a);
+    //Y = y0 + (x - x0) * sin(a) + (y - y0) * cos(a);
     
-    
-    tmp.x = _b.x*cos(angle) - _b.y*sin(angle);
-    tmp.y = _b.x*sin(angle) + _b.y*cos(angle); 
-    _b.x = tmp.x;
-    _b.y = tmp.y;
-    
-    
-    tmp.x = _c.x*cos(angle) - _c.y*sin(angle);
-    tmp.y = _c.x*sin(angle) + _c.y*cos(angle); 
-    _c.x = tmp.x;
-    _c.y = tmp.y;
-    
-    
-    tmp.x = _d.x*cos(angle) - _d.y*sin(angle);
-    tmp.y = _d.x*sin(angle) + _d.y*cos(angle); 
-    _d.x = tmp.x;
-    _d.y = tmp.y;    
+    tmp.x = centre.x + (_a.x - centre.x)*cos(angle) - (_a.y - centre.y)*sin(angle);
+    tmp.y = centre.y + (_a.x - centre.x)*sin(angle) + (_a.y - centre.y)*cos(angle);
+    _a.x = round(tmp.x*10000)/10000;
+    _a.y = round(tmp.y*10000)/10000;
+
+
+    tmp.x = centre.x + (_b.x - centre.x)*cos(angle) - (_b.y - centre.y)*sin(angle);
+    tmp.y = centre.y + (_b.x - centre.x)*sin(angle) + (_b.y - centre.y)*cos(angle);
+    _b.x = round(tmp.x*10000)/10000;
+    _b.y = round(tmp.y*10000)/10000;
+
+
+    tmp.x = centre.x + (_c.x - centre.x)*cos(angle) - (_c.y - centre.y)*sin(angle);
+    tmp.y = centre.y + (_c.x - centre.x)*sin(angle) + (_c.y - centre.y)*cos(angle);
+    _c.x = round(tmp.x*10000)/10000;
+    _c.y = round(tmp.y*10000)/10000;
+
+
+    tmp.x = centre.x + (_d.x - centre.x)*cos(angle) - (_d.y - centre.y)*sin(angle);
+    tmp.y = centre.y + (_d.x - centre.x)*sin(angle) + (_d.y - centre.y)*cos(angle);
+    _d.x = round(tmp.x*10000)/10000;
+    _d.y = round(tmp.y*10000)/10000;
 }
 
 
 void Trapeze::scale(double factor){
-    _a.x *= factor; _a.y *= factor;
-    _b.x *= factor; _b.y *= factor;
-    _c.x *= factor; _c.y *= factor;
-    _d.x *= factor; _d.y *= factor;
-
+    Point centre = positionCentre();
+    
+    vector <double> xArray = {_a.x, _b.x, _c.x, _d.x};
+    vector <double> yArray = {_a.y, _b.y, _c.y, _d.y};
+     
+    for (int i = 0; i < xArray.capacity() ; i++) {
+        if (xArray[i] > centre.x) {
+            xArray[i] = centre.x + (xArray[i] - centre.x) * factor;
+            
+        } else {
+            xArray[i] = centre.x - (centre.x - xArray[i]) * factor; 
+        }
+    }
+    
+    for (int i = 0; i < yArray.capacity() ; i++) {
+        if (yArray[i] > centre.y) {
+            yArray[i] = centre.y + (yArray[i] - centre.y) * factor; 
+        } else {
+            yArray[i] = centre.y - (centre.y - yArray[i]) * factor; 
+        }
+    }
+    
+    
+    _a.x = xArray[0]; _a.y = yArray[0];
+    _b.x = xArray[1]; _b.y = yArray[1];
+    _c.x = xArray[2]; _c.y = yArray[2];
+    _d.x = xArray[3]; _d.y = yArray[3];
+ 
 }
 
 
@@ -109,8 +282,7 @@ string Trapeze::getColor() {
 
 
 ostream& operator<<(ostream& os, const Trapeze& trap){
-    os << '(' << trap._a.x << ':' << trap._a.y << ')' << endl << '(' << trap._b.x << ':' << trap._b.y << ')' << endl << '(' << trap._c.x << ':' << trap._c.y << ')' << endl << '(' << trap._d.x << ':' << trap._d.y << ')' << endl;
-            
+    os << '(' << trap._a.x << ':' << trap._a.y << ')' << endl << '(' << trap._b.x << ':' << trap._b.y << ')' << endl << '(' << trap._c.x << ':' << trap._c.y << ')' << endl << '(' << trap._d.x << ':' << trap._d.y << ')' << endl;       
     return os;
 
 }
